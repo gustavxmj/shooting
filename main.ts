@@ -57,6 +57,87 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         mario.vy = -100
     }
 })
+function make_enemis () {
+    for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
+        rabbit = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.Enemy)
+        animation.runImageAnimation(
+        rabbit,
+        [img`
+            . . . . . . d . d . . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d d d d d d . . . . . 
+            . . . . . 2 d 2 d d d d d . . . 
+            . . . . d d d d d d d d d . . . 
+            9 9 9 9 2 2 2 d d d d d d d . . 
+            . 9 9 9 1 1 d d d d d d d d . . 
+            9 9 9 9 d d d d d d d d d d . . 
+            . . 9 . f f f f f f f f d d . . 
+            . . 9 f d f d d d f d f d d d d 
+            . . f d d f d d f d d f d d d d 
+            . . f d f d d f d d d f d d d d 
+            . . f d f f f f f f f . . . . . 
+            `,img`
+            . . . . . . d . d . . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d d d d d d . . . . . 
+            . . . . . 2 d 2 d d d d . . . . 
+            . . . . d d d d d d d d d . . . 
+            . 9 9 9 9 2 2 d d d d d d . . . 
+            . . 9 9 9 1 d d d d d d d d . . 
+            . 9 9 9 9 d d d d d d d d d . . 
+            . . . 9 f f f f f f f f d d . . 
+            . . . 9 f d f d d d f f d d d d 
+            . . . f d d f d d f d f d d d d 
+            . . . f d f d d f d d f d d d d 
+            . . . f d f f f f f f . . . . . 
+            `,img`
+            . . . . . . d . d . . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d 3 d 3 d . . . . . . 
+            . . . . . d d d d d d . . . . . 
+            . . . . . 2 d 2 d d d d . . . . 
+            . . . . d d d d d d d d d . . . 
+            . 9 9 9 9 2 2 d d d d d d . . . 
+            . . 9 9 9 1 d d d d d d d d . . 
+            . 9 9 9 9 d d d d d d d d d . . 
+            . . . 9 f f f f f f f f d d . . 
+            . . . 9 f d f d d d f f d d d . 
+            . . . f d d f d d f d f d d d . 
+            . . . f d f d d f d d f d d d . 
+            . . . f d f f f f f f . . . . . 
+            `],
+        500,
+        true
+        )
+        tiles.placeOnTile(rabbit, value)
+        tiles.setTileAt(value, assets.tile`transparency16`)
+    }
+}
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.hazardLava1, function (sprite, location) {
     game.gameOver(false)
 })
@@ -79,6 +160,7 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.ShieldKind, function (sprite
     sprites.destroy(sprite, effects.halo, 500)
 })
 let broken_shield: Sprite = null
+let rabbit: Sprite = null
 let shield: Sprite = null
 let shoot: Sprite = null
 let mario: Sprite = null
@@ -205,6 +287,7 @@ scene.setBackgroundImage(img`
     eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeebbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
     eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeebbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
     `)
+let mario_v = 100
 mario = sprites.create(img`
     . . 2 2 2 2 2 . . . . . . . . . 
     . 2 2 2 2 2 2 2 2 . . . . . . . 
@@ -223,8 +306,18 @@ mario = sprites.create(img`
     . . 8 8 . 8 8 . . . . . . . . . 
     . . e e . e e . . . . . . . . . 
     `, SpriteKind.Player)
+let marios_turn = 1
 mario.setStayInScreen(true)
 scene.cameraFollowSprite(mario)
-controller.moveSprite(mario, 100, 0)
+controller.moveSprite(mario, mario_v, 0)
 mario.ay = 200
+make_enemis()
 make_shield()
+game.onUpdateInterval(5000, function () {
+    if (mario_v > 0) {
+        mario_v = 0
+    } else {
+        mario_v = 100
+    }
+    controller.moveSprite(mario, mario_v, 0)
+})
