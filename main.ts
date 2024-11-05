@@ -2,30 +2,38 @@ namespace SpriteKind {
     export const ShieldKind = SpriteKind.create()
     export const BrokenShiledKind = SpriteKind.create()
 }
+function make_marios_turn_again () {
+    marios_turn = 1
+    controller.moveSprite(mario, 100, 0)
+}
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    shoot = sprites.create(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . b b . . . . . . . 
-        . . . . . . b 5 5 b . . . . . . 
-        . . . b b b 5 5 1 1 b b b . . . 
-        . . . b 5 5 5 5 1 1 5 5 b . . . 
-        . . . . b d 5 5 5 5 d b . . . . 
-        . . . . c b 5 5 5 5 b c . . . . 
-        . . . . c 5 d d d d 5 c . . . . 
-        . . . . c 5 d c c d 5 c . . . . 
-        . . . . c c c . . c c c . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `, SpriteKind.Projectile)
-    shoot.setVelocity(50, 0)
-    shoot.setPosition(mario.x, mario.y)
-    shoot.setStayInScreen(false)
-    shoot.setFlag(SpriteFlag.GhostThroughWalls, true)
-    shoot.setFlag(SpriteFlag.DestroyOnWall, true)
+    if (marios_turn == 1) {
+        shoot = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . b b . . . . . . . 
+            . . . . . . b 5 5 b . . . . . . 
+            . . . b b b 5 5 1 1 b b b . . . 
+            . . . b 5 5 5 5 1 1 5 5 b . . . 
+            . . . . b d 5 5 5 5 d b . . . . 
+            . . . . c b 5 5 5 5 b c . . . . 
+            . . . . c 5 d d d d 5 c . . . . 
+            . . . . c 5 d c c d 5 c . . . . 
+            . . . . c c c . . c c c . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.Projectile)
+        shoot.setVelocity(50, 0)
+        shoot.setPosition(mario.x, mario.y)
+        shoot.setStayInScreen(false)
+        shoot.setFlag(SpriteFlag.GhostThroughWalls, true)
+        shoot.setFlag(SpriteFlag.DestroyOnWall, true)
+        marios_turn = 0
+        controller.moveSprite(mario, 0, 0)
+    }
 })
 function make_shield () {
     for (let value of tiles.getTilesByType(assets.tile`myTile2`)) {
@@ -53,8 +61,10 @@ function make_shield () {
     }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (mario.vy == 0) {
-        mario.vy = -100
+    if (marios_turn == 1) {
+        if (mario.vy == 0) {
+            mario.vy = -100
+        }
     }
 })
 function make_enemis () {
@@ -141,6 +151,10 @@ function make_enemis () {
 scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.hazardLava1, function (sprite, location) {
     game.gameOver(false)
 })
+function rabbits_turn () {
+    music.play(music.melodyPlayable(music.baDing), music.PlaybackMode.UntilDone)
+    music.play(music.createSoundEffect(WaveShape.Noise, 3300, 1400, 255, 0, 2000, SoundExpressionEffect.Warble, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
+}
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.ShieldKind, function (sprite, otherSprite) {
     broken_shield = sprites.create(img`
         . . . . . . . a a . . . . . . f 
@@ -163,6 +177,7 @@ let broken_shield: Sprite = null
 let rabbit: Sprite = null
 let shield: Sprite = null
 let shoot: Sprite = null
+let marios_turn = 0
 let mario: Sprite = null
 tiles.setCurrentTilemap(tilemap`level2`)
 scene.setBackgroundImage(img`
@@ -306,18 +321,16 @@ mario = sprites.create(img`
     . . 8 8 . 8 8 . . . . . . . . . 
     . . e e . e e . . . . . . . . . 
     `, SpriteKind.Player)
-let marios_turn = 1
+marios_turn = 1
 mario.setStayInScreen(true)
 scene.cameraFollowSprite(mario)
 controller.moveSprite(mario, mario_v, 0)
 mario.ay = 200
 make_enemis()
 make_shield()
-game.onUpdateInterval(5000, function () {
-    if (mario_v > 0) {
-        mario_v = 0
-    } else {
-        mario_v = 100
+game.onUpdateInterval(1000, function () {
+    if (marios_turn == 0) {
+        rabbits_turn()
+        make_marios_turn_again()
     }
-    controller.moveSprite(mario, mario_v, 0)
 })
